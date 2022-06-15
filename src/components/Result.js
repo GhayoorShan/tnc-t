@@ -8,12 +8,14 @@ const Result = () => {
   console.log("Result", posts);
 
   const renderdPosts = posts.map((post, i) => (
-    <div class="card text-left p-2 mb-3" style={{ alignItems: "left" }}>
+    <div class="card text-left p-3 mb-3" style={{ alignItems: "left" }}>
       <div>
         <h3>{post.question}</h3>
-        {post.answers.map((answer) => {
-          return <li>{answer}</li>;
-        })}
+        <ol>
+          {post.answers.map((answer) => {
+            return <li>{answer}</li>;
+          })}
+        </ol>
       </div>
     </div>
   ));

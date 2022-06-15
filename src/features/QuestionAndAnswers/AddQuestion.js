@@ -1,7 +1,8 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { postAdded } from "../QuestionAndAnswers/addQuestionSlice";
 import { useNavigate } from "react-router-dom";
+
 function AddQuestion() {
   let [inputList, setInputList] = useState([{ question: "", answers: [""] }]);
 
@@ -27,11 +28,10 @@ function AddQuestion() {
     list.splice(index, 1);
     setInputList(list);
   };
-  const handleRemoveAnswer = (qIdx, aIdx) => {
+
+  const handleRemoveAnswer = (e, qIdx, aIdx) => {
     const list = [...inputList];
     list[qIdx].answers.splice(aIdx, 1);
-    // delete inputList[qIdx].answers[aIdx];
-    // setInputList([...inputList]);
     setInputList(list);
   };
 
@@ -45,7 +45,30 @@ function AddQuestion() {
     setInputList([...inputList]);
   };
 
+  // handle click event of the Submit button
   const handleSubmit = (e) => {
+    let isValid = true;
+    for (let q of inputList) {
+      if (
+        q.question === undefined ||
+        q.question === null ||
+        q.question.trim().length === 0
+      ) {
+        isValid = false;
+        break;
+      }
+      for (let a of q.answers) {
+        if (a === undefined || a === null || a.trim().length === 0) {
+          isValid = false;
+          break;
+        }
+      }
+    }
+    if (!isValid) {
+      alert("Input Cant be Null");
+      e.preventDefault();
+      return false;
+    }
     e.preventDefault();
     console.log("Submit");
     dispatch(postAdded(inputList));
@@ -56,7 +79,7 @@ function AddQuestion() {
     <>
       {inputList.map((x, i) => {
         return (
-          <form onSubmit={(e) => handleSubmit(e)}>
+          <form>
             <div key={i} className="mb-2">
               <div className="input-group mb-3">
                 <span className="input-group-text bg-danger">Q {i + 1}</span>
@@ -71,8 +94,9 @@ function AddQuestion() {
 
                 {inputList.length !== 1 && (
                   <button
+                    type="button"
                     className="btn btn-outline-secondary"
-                    onClick={() => handleRemoveQuestion(i)}
+                    onClick={(e) => handleRemoveQuestion(i)}
                   >
                     Remove
                   </button>
@@ -89,14 +113,15 @@ function AddQuestion() {
                           className=" form-control mb-2"
                           name="answer"
                           placeholder="Answer"
-                          value={a.answer}
+                          value={a}
                           onChange={(e) => handleAnswerInputChange(e, i, aIdx)}
                         />
 
                         {x.answers.length !== 1 && (
                           <button
+                            type="button"
                             className="btn mb-2"
-                            onClick={() => handleRemoveAnswer(i, aIdx)}
+                            onClick={(e) => handleRemoveAnswer(e, i, aIdx)}
                           >
                             <span aria-hidden="true">&times;</span>
                           </button>
@@ -126,7 +151,10 @@ function AddQuestion() {
                     Add Question +
                   </button>
                   <div className="d-flex flex-row-reverse">
-                    <button className="btn bg-warning mt-4 w-25" type="submit">
+                    <button
+                      className="btn bg-warning mt-4 w-25"
+                      onClick={(e) => handleSubmit(e)}
+                    >
                       SUBMIT
                     </button>
                   </div>
@@ -136,7 +164,6 @@ function AddQuestion() {
           </form>
         );
       })}
-      {/* <div style={{ marginTop: 20 }}>{JSON.stringify(inputList)}</div> */}
     </>
   );
 }
